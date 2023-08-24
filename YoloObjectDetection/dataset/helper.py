@@ -30,3 +30,15 @@ def show_examples(dataset,num_examples):
         fig.add_subplot(rows,cols,i+1)
         display_one_image(data)
     plt.show()
+
+
+def show_anchors(anchor_boxes):
+
+  fig=plt.figure(figsize=(5*yod.num_anchors,5*1))
+  for i,anchor_box in enumerate(anchor_boxes):
+    fig.add_subplot(1,yod.num_anchors,i+1)
+    plt.imshow(np.zeros((int(yod.output_size),int(yod.output_size),3)))
+    # plt.imshow(np.zeros((4,4,3)))
+    plt.gca().add_patch(Rectangle((1,1),(anchor_box[0]),(anchor_box[1]),linewidth=4,edgecolor=np.random.rand(3),facecolor='none'))
+    plt.text(1,1,f'w:{np.round(anchor_box[0],2)},h:{np.round(anchor_box[1],2)}',bbox=dict(edgecolor='none',facecolor='white', alpha=1))
+  plt.show()

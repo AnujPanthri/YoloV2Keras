@@ -17,10 +17,16 @@ import tensorflow as tf
 
 input_size=608
 num_anchors=4
+scaling_factor = 32
 
 
 
 def set_config(input_size,num_anchors,classnames_path):
+    if input_size % scaling_factor != 0:
+        raise ValueError("INPUT_SIZE_ERROR: choose a input_size which is divisible by {:d}.".format(scaling_factor))
+
+    globals()['output_size'] = input_size / scaling_factor
+
     globals()['input_size'] = input_size
     globals()['num_anchors'] = num_anchors
 
@@ -30,8 +36,11 @@ def set_config(input_size,num_anchors,classnames_path):
     
     globals()['class_colors']={class_name:np.random.rand(3) for class_name in globals()["classnames"]}
     
+def set_anchors(anchors):
+    globals()['num_anchors'] = len(anchors)
+    globals()['anchors'] = anchors
 
-def yoloDataset(image_dir,annotation_dir,format="PASCAL_VOC",augment=None):
+def ParseDataset(image_dir,annotation_dir,format="PASCAL_VOC",augment=None):
 
     def add_augment(img,obj_names,objs):
         def f(img,obj_names,objs):
@@ -54,9 +63,13 @@ def yoloDataset(image_dir,annotation_dir,format="PASCAL_VOC",augment=None):
 
 
     if format == "PASCAL_VOC":
-        ds=dataset.voc_dataset.parse(image_dir=image_dir,annotation_dir=annotation_dir)
+        ds=dataset.VOCDataset.parse(image_dir=image_dir,annotation_dir=annotation_dir)
    
     if augment:
         ds=ds.map(add_augment,num_parallel_calls=tf.data.AUTOTUNE)
 
     return ds
+
+
+def yoloDataset(ds):
+    pass

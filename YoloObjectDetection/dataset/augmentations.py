@@ -66,7 +66,7 @@ class BBoxSafeRandomSquareCrop(DualTransform):
 def default_augmentation():
     train_transform=A.Compose([
                             # BBoxSafeRandomSquareCrop(scale=[5,8]),
-                            # BBoxSafeRandomSquareCrop(scale=[3,5,6,8],p=[1.5,1.5,2,2]),
+                            BBoxSafeRandomSquareCrop(scale=[3,5,6,8],p=[1.5,1.5,2,2]),
                             A.Resize(yod.input_size,yod.input_size),
                             A.HorizontalFlip(p=0.5),
                             A.RandomBrightnessContrast(p=0.2),
@@ -76,7 +76,7 @@ def default_augmentation():
     # ], bbox_params=A.BboxParams(format='yolo',label_fields=['class_labels'],min_visibility=0.90))
     ], bbox_params=A.BboxParams(format='yolo',label_fields=['class_labels'],min_visibility=0.99))
     val_transform=A.Compose([
-                            # BBoxSafeRandomSquareCrop(scale=[5,8]),
+                            BBoxSafeRandomSquareCrop(scale=[5,8]),
                             A.Resize(yod.input_size,yod.input_size),
     # ], bbox_params=A.BboxParams(format='yolo',label_fields=['class_labels'],min_visibility=0.90))
     ], bbox_params=A.BboxParams(format='yolo',label_fields=['class_labels'],min_visibility=0.99))
