@@ -1,9 +1,18 @@
+import os
 import struct
+import pathlib
 import numpy as np
 import YoloObjectDetection as yod
 import tensorflow as tf
+import urllib.request
+
+from urllib.parse import urlparse
+from appdirs import user_cache_dir
 from tensorflow.keras import layers
 from tensorflow.keras import Model
+import wget
+
+_CACHE_DIR = user_cache_dir('yolov2keras')
 
 
 # tf.keras.saving.get_custom_objects().clear()
@@ -153,20 +162,34 @@ def getYolov2(pretrained=True):
 
     model = Model(x_input,out,name='yolo_v2_model')
     
-    
-    path_to_weight = get_file_path("https://pjreddie.com/media/files/yolov2.weights");offset=4;nb_conv = 23;  # (trained on coco dataset (80 classes))
-    # path_to_weight = "./yolov2-voc.weights";offset=5;nb_conv = 23;
-    # path_to_weight = 'darknet19_448.conv.23';offset=4;nb_conv = 18;
-    model = load_yolo_weights(model,path_to_weight,offset,nb_conv)
+    if pretrained:
+        path_to_weight = get_file_path("https://pjreddie.com/media/files/yolov2.weights");offset=4;nb_conv = 23;  # (trained on coco dataset (80 classes))
+        # path_to_weight = "./yolov2-voc.weights";offset=5;nb_conv = 23;
+        # path_to_weight = 'darknet19_448.conv.23';offset=4;nb_conv = 18;
+        model = load_yolo_weights(model,path_to_weight,offset,nb_conv)
+
     return model
 
+def getMobileNet(pretrained=True):
+    x_input=layers.Input(shape=(None,None,3))
+    x=layers.Lambda(lambda x:x/255.)(x_input)
+    x=tf.keras.applications.MobileNet(include_top=False, weights='imagenet' if pretrained else 'none')(x)
+    x=layers.Conv2D((yod.num_anchors*(5+len(yod.classnames))),(1,1),strides=(1,1),padding='same',name='last_conv')(x)
+    out=yolo_reshape(yod.num_anchors,(5+len(yod.classnames)))(x)
+    model=Model(x_input,out,name='yolo_v2_mobilenet')
+    return model
 
-def get_file_path(url):
-   # returns file path 
-   # downloads file from the given url if not already present
-   # should work on both os
-   pass
-   
+def get_file_path(url: str) -> pathlib.Path:
+    """"""
+    basename = os.path.basename(urlparse(url).path)
+    if os.access(os.path.join(_CACHE_DIR, basename), os.F_OK | os.R_OK):
+        return os.path.join(_CACHE_DIR, basename)
+    
+    if not os.path.exists(_CACHE_DIR):  os.makedirs(_CACHE_DIR)
+    wget.download(url,out = _CACHE_DIR)
+    print()
+    
+    return os.path.join(_CACHE_DIR, basename)   
 
 
 def load_yolo_weights(model,path_to_weight,offset,nb_conv):
@@ -206,13 +229,13 @@ def load_yolo_weights(model,path_to_weight,offset,nb_conv):
             kernel = weight_reader.read_bytes(np.prod(conv_layer.get_weights()[0].shape))
             kernel = kernel.reshape(list(reversed(conv_layer.get_weights()[0].shape)))
             kernel = kernel.transpose([2,3,1,0])
-            print(kernel.shape)
+            # print(kernel.shape)
             kernel=kernel.reshape([*kernel.shape[:-1],yod.num_anchors,-1]) # reshape to this format so we change change position of p idx
             idx=4 # in darknet each object was encoded as [x,y,w,h,p,c] but we use [p,x,y,w,h,c]
             kernel=np.concatenate([kernel[...,idx:idx+1],kernel[...,:idx],kernel[...,idx+1:]],axis=-1)  # setting p to idx 0
-            print(kernel.shape)
+            # print(kernel.shape)
             kernel=kernel.reshape([*kernel.shape[:-2],-1])
-            print(kernel.shape)
+            # print(kernel.shape)
             conv_layer.set_weights([kernel, bias])
         else:
             kernel = weight_reader.read_bytes(np.prod(conv_layer.get_weights()[0].shape))
@@ -223,7 +246,7 @@ def load_yolo_weights(model,path_to_weight,offset,nb_conv):
 
     layer   = model.layers[-2] # the last convolutional layer
     weights = layer.get_weights()
-    print(layer.name)
+    # print(layer.name)
     new_kernel = np.random.normal(size=weights[0].shape)/(yod.output_size*yod.output_size)
     new_bias   = np.random.normal(size=weights[1].shape)/(yod.output_size*yod.output_size)
 

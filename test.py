@@ -55,5 +55,6 @@ for data in val_ds.take(1):
 
 # yod.dataset.helper.show_yolo_examples(train_ds)
 
-model = yod.models.getYolov2(pretrained=True)
-# model.summary()
+# model = yod.models.getYolov2(pretrained=True)
+model = yod.models.getMobileNet(pretrained=True)
+model.summary()
