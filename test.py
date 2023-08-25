@@ -54,3 +54,6 @@ for data in val_ds.take(1):
     print(data[1].shape)
 
 # yod.dataset.helper.show_yolo_examples(train_ds)
+
+model = yod.models.getYolov2(pretrained=True)
+# model.summary()
