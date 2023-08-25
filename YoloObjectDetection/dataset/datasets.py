@@ -67,9 +67,10 @@ class VOCDataset(BaseDataset):
 
 
   @classmethod
-  def parse(cls,image_dir,annotation_dir):
+  def parse(cls,image_dir,annotation_dir,shuffle):
       annotations_list = glob(annotation_dir+"*.xml")
       dataset = tf.data.Dataset.from_tensor_slices((annotations_list))
+      if shuffle: dataset=dataset.shuffle(2048)
       dataset = dataset.map(cls.load_data(image_dir),num_parallel_calls=tf.data.AUTOTUNE)
       return dataset
 
@@ -82,10 +83,12 @@ class VOCDataset(BaseDataset):
 
 
   @classmethod
-  def get_classnames_path(cls,annotation_dir):
-    classnames_path = annotation_dir.rsplit("/")[0]+"/classnames.txt"
+  def get_classnames_path(self,*annotation_dirs):
+    classnames_path = annotation_dirs[0].rsplit("/")[0]+"/classnames.txt"
+    classnames = []
     if not os.path.exists(classnames_path):
-      classnames = cls.get_class_names(annotation_dir)
+      for annotation_dir in annotation_dirs:
+        classnames.extend(self.get_class_names(annotation_dir))
       
       with open(classnames_path,"w") as f:
         f.write("\n".join(classnames))
