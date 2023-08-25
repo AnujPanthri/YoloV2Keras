@@ -10,6 +10,7 @@
 
 
 from . import dataset
+from . import models
 import numpy as np
 import tensorflow as tf
 import tensorflow.keras.backend as K
