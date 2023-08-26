@@ -23,6 +23,12 @@ import tensorflow.keras.backend as K
 import math
 
 
+__name__ = 'yolov2keras'
+
+INPUT_SIZE = 608
+N_ANCHORS = 4
+SCALE_FACTOR = 32
+
 # default configs
 input_size=608
 num_anchors=4
