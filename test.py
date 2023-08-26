@@ -1,5 +1,5 @@
 import YoloObjectDetection as yod 
-
+import tensorflow as tf
 
 
 train_image_dir="roboflow.voc/train/"
@@ -46,9 +46,6 @@ print(yod.anchors)
 train_ds=yod.yoloDataset(train_ds,batch_size=4,drop_remainder=True)
 val_ds=yod.yoloDataset(val_ds,batch_size=4)
 
-print(train_ds)
-print(val_ds)
-
 for data in val_ds.take(1):
     print(data[0].shape)
     print(data[1].shape)
@@ -57,4 +54,14 @@ for data in val_ds.take(1):
 
 # model = yod.models.getYolov2(pretrained=True)
 model = yod.models.getMobileNet(pretrained=True)
-model.summary()
+# model.summary()
+
+losses = [yod.losses.obj_loss,yod.losses.noobj_loss,yod.losses.box_loss,yod.losses.class_loss]
+loss_weights = [yod.losses.default_loss_weights[loss.__name__] for loss in losses]
+optimizer = tf.keras.optimizers.Adam(learning_rate=1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
+metrics = [yod.metrics.iou_acc , yod.metrics.class_acc ]
+print(losses[0].__name__)
+model.compile(optimizer=optimizer,loss=losses,metrics=metrics,loss_weights=loss_weights)
+# model.compile(optimizer=optimizer,loss=losses,metrics=metrics)
+
+model.fit(train_ds,validation_data=val_ds,epochs=10,verbose=1)

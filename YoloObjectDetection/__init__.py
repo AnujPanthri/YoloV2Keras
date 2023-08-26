@@ -11,6 +11,10 @@
 
 from . import dataset
 from . import models
+from . import helper
+from . import losses
+from . import metrics
+
 import numpy as np
 import tensorflow as tf
 import tensorflow.keras.backend as K
@@ -43,6 +47,7 @@ def set_config(input_size,num_anchors,classnames_path):
 def set_anchors(anchors):
     globals()['num_anchors'] = len(anchors)
     globals()['anchors'] = anchors
+    globals()['tf_anchors'] = K.reshape(K.variable(anchors),[1, 1, 1, globals()['num_anchors'] , 2])
 
 def ParseDataset(image_dir,annotation_dir,format="PASCAL_VOC",augment=None,shuffle=False):
 
@@ -77,41 +82,6 @@ def ParseDataset(image_dir,annotation_dir,format="PASCAL_VOC",augment=None,shuff
 
 def yoloDataset(ds,batch_size=1,prefetch=True,cache=False,drop_remainder=False):
     global output_size,classnames,anchors
-    def np_get_iou(y_true, y_pred):
-        """Intersection Over Union checks overlapping between objects.
-            * 0 indicates no overlapping.
-            * 1 indicates perfect overlapping.
-
-        Args:
-            y_true (objects, [x, y, w, h])
-            y_pred (objects, [x, y, w, h])
-        """
-        box1_x1 = y_true[:,0:1] - y_true[:,2:3] / 2
-        box1_y1 = y_true[:,1:2] - y_true[:,3:] / 2
-        box1_x2 = y_true[:,0:1] + y_true[:,2:3] / 2
-        box1_y2 = y_true[:,1:2] + y_true[:,3:] / 2
-
-        box2_x1 = y_pred[:,0:1] - y_pred[:,2:3] / 2
-        box2_y1 = y_pred[:,1:2] - y_pred[:,3:] / 2
-        box2_x2 = y_pred[:,0:1] + y_pred[:,2:3] / 2
-        box2_y2 = y_pred[:,1:2] + y_pred[:,3:] / 2
-
-        
-        xmins = np.maximum(box1_x1,box2_x1)
-        ymins = np.maximum(box1_y1,box2_y1)
-        
-        xmaxs = np.minimum(box1_x2,box2_x2)
-        ymaxs = np.minimum(box1_y2,box2_y2)
-
-
-
-        intersection = np.clip((xmaxs-xmins),0,None)*np.clip((ymaxs-ymins),0,None)
-        
-        union = (box1_x2-box1_x1)*(box1_y2-box1_y1) + (box2_x2-box2_x1)*(box2_y2-box2_y1)
-        ious=intersection/((union-intersection)+1e-6)
-        
-        return ious
-    
 
 
     xywh_anchors=np.c_[np.zeros_like(anchors),anchors]  # adding x=0,y=0 to anchors
@@ -135,7 +105,7 @@ def yoloDataset(ds,batch_size=1,prefetch=True,cache=False,drop_remainder=False):
                
                 obj_to_check=np.r_[np.zeros(2),obj[2:]][None] # adding x,y=0,0
                 
-                ious=np_get_iou(obj_to_check,xywh_anchors)
+                ious=helper.np_get_iou(obj_to_check,xywh_anchors)
                 best_anchor_idx,best_iou=np.argmax(ious),np.max(ious)
                 # print('best_anchor_idx:',best_anchor_idx,'ious:',best_iou)
                 
