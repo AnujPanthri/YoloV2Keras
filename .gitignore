@@ -2,3 +2,8 @@ __pycache__
 
 roboflow.voc.zip
 roboflow.voc
+
+# Virtual environments
+venv/
+dev/
+yolov2_dev/
