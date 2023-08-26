@@ -1,4 +1,4 @@
-import YoloObjectDetection as yod
+import yolov2keras as yod
 import tensorflow as tf
 import tensorflow.keras.backend as K
 

@@ -1,6 +1,6 @@
 import tensorflow as tf
 import tensorflow.keras.backend as K
-import YoloObjectDetection as yod
+import yolov2keras as yod
 
 def iou_acc(y_true,y_pred):
 

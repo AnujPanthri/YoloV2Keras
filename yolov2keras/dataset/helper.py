@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 import math
 import numpy as np
-import YoloObjectDetection as yod
+import yolov2keras as yod
 
 
 

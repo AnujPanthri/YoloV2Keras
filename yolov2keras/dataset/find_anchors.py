@@ -1,4 +1,4 @@
-import YoloObjectDetection as yod
+import yolov2keras as yod
 import numpy as np
 from tqdm import tqdm
 from sklearn.cluster import KMeans

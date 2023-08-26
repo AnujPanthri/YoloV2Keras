@@ -2,7 +2,7 @@ import os
 import struct
 import pathlib
 import numpy as np
-import YoloObjectDetection as yod
+import yolov2keras as yod
 import tensorflow as tf
 import urllib.request
 

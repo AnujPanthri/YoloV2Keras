@@ -3,7 +3,7 @@ import albumentations as A
 from albumentations.core.transforms_interface import DualTransform
 import cv2
 import numpy as np
-import YoloObjectDetection as yod
+import yolov2keras as yod
 
 class BBoxSafeRandomSquareCrop(DualTransform):
     def __init__(self,scale=[1,1.5],p=None):

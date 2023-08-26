@@ -4,7 +4,7 @@ import numpy as np
 import xml.etree.ElementTree as ET
 from glob import glob
 import os
-import YoloObjectDetection as yod
+import yolov2keras as yod
 from abc import ABC , abstractmethod  # for making abstract class methods
 
 

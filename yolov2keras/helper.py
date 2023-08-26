@@ -1,3 +1,6 @@
+# TODO(AnujPanthri): Replace the imports for `np_get_iou` and `tf_get_iou` with
+# the generalised `utils.iou.GetIoU`.
+
 import tensorflow as tf
 import tensorflow.keras.backend as K
 import numpy as np
