@@ -1,4 +1,4 @@
-import yolov2keras as yod
+from yolov2keras import config
 import numpy as np
 from tqdm import tqdm
 from sklearn.cluster import KMeans
@@ -18,13 +18,13 @@ def find_anchors(dataset):
     
     
     w_h=all_width_height
-    kmeans=KMeans(yod.num_anchors).fit(w_h)
+    kmeans=KMeans(config.num_anchors).fit(w_h)
     z=kmeans.predict(w_h)
     
 
     anchor_boxes = kmeans.cluster_centers_
 
-    scale = yod.output_size / yod.input_size
+    scale = config.output_size / config.input_size
     anchor_boxes=anchor_boxes*scale  #  (anchor_boxes/image_size)*output_size
 
     return anchor_boxes

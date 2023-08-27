@@ -1,6 +1,6 @@
 import tensorflow as tf
 import tensorflow.keras.backend as K
-import yolov2keras as yod
+from yolov2keras import config,utils
 
 def iou_acc(y_true,y_pred):
 
@@ -10,8 +10,8 @@ def iou_acc(y_true,y_pred):
   obj=y_true[...,0]==1
 
 
-  box_pred = K.concatenate([y_pred_xy,K.clip(K.exp(y_pred_wh)*yod.tf_anchors,0,yod.output_size)],axis=-1)
-  ious=yod.utils.GetIoU(y_true[...,1:5][obj],box_pred[obj])
+  box_pred = K.concatenate([y_pred_xy,K.clip(K.exp(y_pred_wh)*config.tf_anchors,0,config.output_size)],axis=-1)
+  ious=utils.GetIoU(y_true[...,1:5][obj],box_pred[obj])
 
   return ious*100
   # return tf.reduce_mean(ious)

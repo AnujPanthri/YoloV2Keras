@@ -4,7 +4,7 @@ import numpy as np
 import xml.etree.ElementTree as ET
 from glob import glob
 import os
-import yolov2keras as yod
+from yolov2keras import config
 from abc import ABC , abstractmethod  # for making abstract class methods
 
 
@@ -33,7 +33,7 @@ class VOCDataset(BaseDataset):
       bndbox=member.find('bndbox')
       xmin,ymin , xmax,ymax=np.clip(float(bndbox.find('xmin').text),0,width),np.clip(float(bndbox.find('ymin').text),0,height),np.clip(float(bndbox.find('xmax').text),0,width),np.clip(float(bndbox.find('ymax').text),0,height)
       value=(
-              yod.class_to_idx[member.find('name').text.lower() if len(yod.classnames)>1 else yod.classnames[0]],   # if classnames are more than one then read from xml file otherwise use the classname from classnames list
+              config.class_to_idx[member.find('name').text.lower() if len(config.classnames)>1 else config.classnames[0]],   # if classnames are more than one then read from xml file otherwise use the classname from classnames list
               # class_to_idx[object_name],              # class
               # xmin,  # xmin
               # ymin,  # ymin

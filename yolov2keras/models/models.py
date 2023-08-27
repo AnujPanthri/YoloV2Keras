@@ -2,14 +2,13 @@ import os
 import struct
 import pathlib
 import numpy as np
-import yolov2keras as yod
+from yolov2keras import config
 import tensorflow as tf
 import urllib.request
 
 from urllib.parse import urlparse
 from appdirs import user_cache_dir
-from tensorflow.keras import layers
-from tensorflow.keras import Model
+from tensorflow.keras import layers,Model
 import wget
 
 _CACHE_DIR = user_cache_dir('yolov2keras')
@@ -157,8 +156,8 @@ def getYolov2(pretrained=True):
     x=layers.BatchNormalization(name='norm_22')(x)
     x=layers.LeakyReLU(alpha=0.1)(x)
 
-    x=layers.Conv2D((yod.num_anchors*(5+len(yod.classnames))),(1,1),strides=(1,1),padding='same',name='conv_23')(x)
-    out=yolo_reshape(yod.num_anchors,(5+len(yod.classnames)))(x)
+    x=layers.Conv2D((config.num_anchors*(5+len(config.classnames))),(1,1),strides=(1,1),padding='same',name='conv_23')(x)
+    out=yolo_reshape(config.num_anchors,(5+len(config.classnames)))(x)
 
     model = Model(x_input,out,name='yolo_v2_model')
     
@@ -174,8 +173,8 @@ def getMobileNet(pretrained=True):
     x_input=layers.Input(shape=(None,None,3))
     x=layers.Lambda(lambda x:x/255.)(x_input)
     x=tf.keras.applications.MobileNet(include_top=False, weights='imagenet' if pretrained else 'none')(x)
-    x=layers.Conv2D((yod.num_anchors*(5+len(yod.classnames))),(1,1),strides=(1,1),padding='same',name='last_conv')(x)
-    out=yolo_reshape(yod.num_anchors,(5+len(yod.classnames)))(x)
+    x=layers.Conv2D((config.num_anchors*(5+len(config.classnames))),(1,1),strides=(1,1),padding='same',name='last_conv')(x)
+    out=yolo_reshape(config.num_anchors,(5+len(config.classnames)))(x)
     model=Model(x_input,out,name='yolo_v2_mobilenet')
     return model
 
@@ -230,7 +229,7 @@ def load_yolo_weights(model,path_to_weight,offset,nb_conv):
             kernel = kernel.reshape(list(reversed(conv_layer.get_weights()[0].shape)))
             kernel = kernel.transpose([2,3,1,0])
             # print(kernel.shape)
-            kernel=kernel.reshape([*kernel.shape[:-1],yod.num_anchors,-1]) # reshape to this format so we change change position of p idx
+            kernel=kernel.reshape([*kernel.shape[:-1],config.num_anchors,-1]) # reshape to this format so we change change position of p idx
             idx=4 # in darknet each object was encoded as [x,y,w,h,p,c] but we use [p,x,y,w,h,c]
             kernel=np.concatenate([kernel[...,idx:idx+1],kernel[...,:idx],kernel[...,idx+1:]],axis=-1)  # setting p to idx 0
             # print(kernel.shape)
@@ -247,8 +246,8 @@ def load_yolo_weights(model,path_to_weight,offset,nb_conv):
     layer   = model.layers[-2] # the last convolutional layer
     weights = layer.get_weights()
     # print(layer.name)
-    new_kernel = np.random.normal(size=weights[0].shape)/(yod.output_size*yod.output_size)
-    new_bias   = np.random.normal(size=weights[1].shape)/(yod.output_size*yod.output_size)
+    new_kernel = np.random.normal(size=weights[0].shape)/(config.output_size*config.output_size)
+    new_bias   = np.random.normal(size=weights[1].shape)/(config.output_size*config.output_size)
 
     layer.set_weights([new_kernel, new_bias])
 

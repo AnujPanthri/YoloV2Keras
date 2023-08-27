@@ -2,8 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 import math
 import numpy as np
-import yolov2keras as yod
-
+from yolov2keras import config
 
 
 
@@ -18,8 +17,8 @@ def show_examples(dataset,num_examples):
     for obj_idx in range(len(objs)):
       center_x,center_y,width,height=objs[obj_idx]
       center_x,center_y,width,height = center_x*image_width , center_y*image_height , width*image_width , height*image_height
-      obj_name=yod.idx_to_class[objs_names[obj_idx]]
-      plt.gca().add_patch(Rectangle(( center_x-(width/2),center_y-(height/2) ),width,height,linewidth=2,edgecolor=yod.class_colors[obj_name],facecolor='none'))
+      obj_name=config.idx_to_class[objs_names[obj_idx]]
+      plt.gca().add_patch(Rectangle(( center_x-(width/2),center_y-(height/2) ),width,height,linewidth=2,edgecolor=config.class_colors[obj_name],facecolor='none'))
       plt.text( center_x-(width/2) , center_y-(height/2) ,obj_name)
     
   rows=math.ceil(num_examples/5)
@@ -34,10 +33,10 @@ def show_examples(dataset,num_examples):
 
 def show_anchors(anchor_boxes):
 
-  fig=plt.figure(figsize=(5*yod.num_anchors,5*1))
+  fig=plt.figure(figsize=(5*config.num_anchors,5*1))
   for i,anchor_box in enumerate(anchor_boxes):
-    fig.add_subplot(1,yod.num_anchors,i+1)
-    plt.imshow(np.zeros((int(yod.output_size),int(yod.output_size),3)))
+    fig.add_subplot(1,config.num_anchors,i+1)
+    plt.imshow(np.zeros((int(config.output_size),int(config.output_size),3)))
     # plt.imshow(np.zeros((4,4,3)))
     plt.gca().add_patch(Rectangle((1,1),(anchor_box[0]),(anchor_box[1]),linewidth=4,edgecolor=np.random.rand(3),facecolor='none'))
     plt.text(1,1,f'w:{np.round(anchor_box[0],2)},h:{np.round(anchor_box[1],2)}',bbox=dict(edgecolor='none',facecolor='white', alpha=1))
@@ -54,18 +53,18 @@ def show_yolo_examples(dataset):
         obj=obj[1:]
         obj[4]=np.argmax(obj[4:])
         obj=obj[:5]
-        obj[:-1]*=yod.cell_size # scaling back w and h
+        obj[:-1]*=config.cell_size # scaling back w and h
 
 
-        obj[1]=(idxs[0][i]*yod.cell_size)+obj[1]  # center y
-        obj[0]=(idxs[1][i]*yod.cell_size)+obj[0]  # center x
+        obj[1]=(idxs[0][i]*config.cell_size)+obj[1]  # center y
+        obj[0]=(idxs[1][i]*config.cell_size)+obj[0]  # center x
 
 
         obj[0]=obj[0]-(obj[2]/2)  # xmin
         obj[1]=obj[1]-(obj[3]/2)  # ymin
 
-        obj_name=yod.idx_to_class[obj[4]]
-        plt.gca().add_patch(Rectangle((obj[0],obj[1]),(obj[2]),(obj[3]),linewidth=1,edgecolor=yod.class_colors[obj_name],facecolor='none'))
+        obj_name=config.idx_to_class[obj[4]]
+        plt.gca().add_patch(Rectangle((obj[0],obj[1]),(obj[2]),(obj[3]),linewidth=1,edgecolor=config.class_colors[obj_name],facecolor='none'))
         plt.text(obj[0],obj[1],obj_name)
 
 

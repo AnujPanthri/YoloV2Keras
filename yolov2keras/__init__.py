@@ -14,6 +14,7 @@ from . import dataset
 from . import models
 from . import losses
 from . import metrics
+from . import config
 
 import numpy as np
 import tensorflow as tf
@@ -27,33 +28,29 @@ INPUT_SIZE = 608
 N_ANCHORS = 4
 SCALE_FACTOR = 32
 
-# default configs
-input_size=608
-num_anchors=4
-scaling_factor = 32
 
 
 
 def set_config(input_size,num_anchors,classnames_path):
-    if input_size % scaling_factor != 0:
-        raise ValueError("INPUT_SIZE_ERROR: choose a input_size which is divisible by {:d}.".format(scaling_factor))
+    if input_size % config.scaling_factor != 0:
+        raise ValueError("INPUT_SIZE_ERROR: choose a input_size which is divisible by {:d}.".format(config.scaling_factor))
 
-    globals()['output_size'] = input_size / scaling_factor
+    config.output_size = input_size / config.scaling_factor
 
-    globals()['input_size'] = input_size
-    globals()['cell_size'] = globals()['input_size'] / globals()['output_size']
-    globals()['num_anchors'] = num_anchors
+    config.input_size = input_size
+    config.cell_size = config.input_size / config.output_size
+    config.num_anchors = num_anchors
 
-    globals()["classnames"] = open(classnames_path,'r').read().split("\n")
-    globals()["class_to_idx"] = {classname:idx for idx,classname in enumerate(globals()["classnames"])}
-    globals()["idx_to_class"] = {idx:classname for idx,classname in enumerate(globals()["classnames"])}
+    config.classnames = open(classnames_path,'r').read().split("\n")
+    config.class_to_idx = {classname:idx for idx,classname in enumerate(config.classnames)}
+    config.idx_to_class = {idx:classname for idx,classname in enumerate(config.classnames)}
     
-    globals()['class_colors']={class_name:np.random.rand(3) for class_name in globals()["classnames"]}
+    config.class_colors = {class_name:np.random.rand(3) for class_name in config.classnames}
     
 def set_anchors(anchors):
-    globals()['num_anchors'] = len(anchors)
-    globals()['anchors'] = anchors
-    globals()['tf_anchors'] = K.reshape(K.variable(anchors),[1, 1, 1, globals()['num_anchors'] , 2])
+    config.num_anchors = len(anchors)
+    config.anchors = anchors
+    config.tf_anchors = K.reshape(K.variable(anchors),[1, 1, 1, config.num_anchors , 2])
 
 def ParseDataset(image_dir,annotation_dir,format="PASCAL_VOC",augment=None,shuffle=False):
 
@@ -87,17 +84,16 @@ def ParseDataset(image_dir,annotation_dir,format="PASCAL_VOC",augment=None,shuff
 
 
 def yoloDataset(ds,batch_size=1,prefetch=True,cache=False,drop_remainder=False):
-    global output_size,classnames,anchors
 
 
-    xywh_anchors=np.c_[np.zeros_like(anchors),anchors]  # adding x=0,y=0 to anchors
+    xywh_anchors=np.c_[np.zeros_like(config.anchors),config.anchors]  # adding x=0,y=0 to anchors
 
     def to_yolo_labels(img,obj_names,objs):
         def f(img,obj_names,objs,output_size):
             output_size=int(output_size)
-            cell_size=(input_size/output_size)
+            cell_size=(config.input_size/output_size)
 
-            grid=np.zeros([output_size,output_size,num_anchors,1+4+len(classnames)])
+            grid=np.zeros([output_size,output_size,config.num_anchors,1+4+len(config.classnames)])
  
             if len(objs)==0: return grid.astype(np.float32)
  
@@ -116,15 +112,15 @@ def yoloDataset(ds,batch_size=1,prefetch=True,cache=False,drop_remainder=False):
                 # print('best_anchor_idx:',best_anchor_idx,'ious:',best_iou)
                 
                 if (grid[obj_r,obj_c,best_anchor_idx,0]==0):
-                    class_one_hot=tf.keras.utils.to_categorical(obj_names[i],num_classes=len(classnames))
+                    class_one_hot=tf.keras.utils.to_categorical(obj_names[i],num_classes=len(config.classnames))
                     grid[obj_r,obj_c,best_anchor_idx]=[ 1 ,obj[0]-(obj_c) , obj[1]-(obj_r) , obj[2] , obj[3] , *class_one_hot ] # p,x,y,w,h,c_1,c_2...c_n
                     # del class_one_hot
 
                 # print(grid[obj_r,obj_c,anchor_idx])
             return grid.astype(np.float32)
-        label=tf.numpy_function(f,[img,obj_names,objs,output_size],tf.float32)
+        label=tf.numpy_function(f,[img,obj_names,objs,config.output_size],tf.float32)
         img.set_shape(img.shape)
-        label.set_shape([int(output_size),int(output_size),num_anchors,1+4+len(classnames)])
+        label.set_shape([int(config.output_size),int(config.output_size),config.num_anchors,1+4+len(config.classnames)])
         return img,label
     
     ds=ds.map(to_yolo_labels,num_parallel_calls=tf.data.AUTOTUNE)

@@ -3,7 +3,7 @@ import albumentations as A
 from albumentations.core.transforms_interface import DualTransform
 import cv2
 import numpy as np
-import yolov2keras as yod
+from yolov2keras import config
 
 class BBoxSafeRandomSquareCrop(DualTransform):
     def __init__(self,scale=[1,1.5],p=None):
@@ -67,7 +67,7 @@ def default_augmentation():
     train_transform=A.Compose([
                             # BBoxSafeRandomSquareCrop(scale=[5,8]),
                             BBoxSafeRandomSquareCrop(scale=[3,5,6,8],p=[1.5,1.5,2,2]),
-                            A.Resize(yod.input_size,yod.input_size),
+                            A.Resize(config.input_size,config.input_size),
                             A.HorizontalFlip(p=0.5),
                             A.RandomBrightnessContrast(p=0.2),
                             A.GaussNoise(var_limit=(10.0, 50.0)),
@@ -77,14 +77,14 @@ def default_augmentation():
     ], bbox_params=A.BboxParams(format='yolo',label_fields=['class_labels'],min_visibility=0.99))
     val_transform=A.Compose([
                             BBoxSafeRandomSquareCrop(scale=[5,8]),
-                            A.Resize(yod.input_size,yod.input_size),
+                            A.Resize(config.input_size,config.input_size),
     # ], bbox_params=A.BboxParams(format='yolo',label_fields=['class_labels'],min_visibility=0.90))
     ], bbox_params=A.BboxParams(format='yolo',label_fields=['class_labels'],min_visibility=0.99))
 
     # TODO: Make available a test set to test our model accuracy.
     test_transform = A.Compose([
     # A.CenterCrop(),
-    A.Resize(yod.input_size,yod.input_size),
+    A.Resize(config.input_size,config.input_size),
     ])
 
     return train_transform,val_transform,test_transform
