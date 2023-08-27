@@ -10,10 +10,8 @@
 
 
 from . import utils
-from .utils import *
 from . import dataset
 from . import models
-from . import helper
 from . import losses
 from . import metrics
 
@@ -113,7 +111,7 @@ def yoloDataset(ds,batch_size=1,prefetch=True,cache=False,drop_remainder=False):
                
                 obj_to_check=np.r_[np.zeros(2),obj[2:]][None] # adding x,y=0,0
                 
-                ious=helper.np_get_iou(obj_to_check,xywh_anchors)
+                ious=utils.GetIoU(obj_to_check,xywh_anchors)
                 best_anchor_idx,best_iou=np.argmax(ious),np.max(ious)
                 # print('best_anchor_idx:',best_anchor_idx,'ious:',best_iou)
                 

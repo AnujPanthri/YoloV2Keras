@@ -21,7 +21,7 @@ def obj_loss(y_true,y_pred):
   obj=y_true[...,0]==1
 
   box_pred = K.concatenate([y_pred_xy,K.clip(K.exp(y_pred_wh)*yod.tf_anchors,0,yod.output_size)],axis=-1)
-  ious=tf.stop_gradient(yod.helper.tf_get_iou(y_true[...,1:5][obj],box_pred[obj]))
+  ious=tf.stop_gradient(yod.utils.GetIoU(y_true[...,1:5][obj],box_pred[obj]))
 
   obj_loss=tf.reduce_mean(K.square(ious*y_true_conf[obj]-y_pred_conf[obj]))  # y_pred_conf should represent iou
 

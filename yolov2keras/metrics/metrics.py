@@ -11,7 +11,7 @@ def iou_acc(y_true,y_pred):
 
 
   box_pred = K.concatenate([y_pred_xy,K.clip(K.exp(y_pred_wh)*yod.tf_anchors,0,yod.output_size)],axis=-1)
-  ious=yod.helper.tf_get_iou(y_true[...,1:5][obj],box_pred[obj])
+  ious=yod.utils.GetIoU(y_true[...,1:5][obj],box_pred[obj])
 
   return ious*100
   # return tf.reduce_mean(ious)

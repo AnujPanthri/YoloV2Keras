@@ -7,3 +7,6 @@ roboflow.voc
 venv/
 dev/
 yolov2_dev/
+
+test copy.py
+test.py

@@ -33,7 +33,7 @@ class VOCDataset(BaseDataset):
       bndbox=member.find('bndbox')
       xmin,ymin , xmax,ymax=np.clip(float(bndbox.find('xmin').text),0,width),np.clip(float(bndbox.find('ymin').text),0,height),np.clip(float(bndbox.find('xmax').text),0,width),np.clip(float(bndbox.find('ymax').text),0,height)
       value=(
-              yod.class_to_idx[member.find('name').text.lower()],              # class
+              yod.class_to_idx[member.find('name').text.lower() if len(yod.classnames)>1 else yod.classnames[0]],   # if classnames are more than one then read from xml file otherwise use the classname from classnames list
               # class_to_idx[object_name],              # class
               # xmin,  # xmin
               # ymin,  # ymin
