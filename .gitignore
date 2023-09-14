@@ -1,7 +1,10 @@
 __pycache__
+.vscode/
 
 roboflow.voc.zip
 roboflow.voc
+
+output/
 
 # Virtual environments
 venv/
@@ -9,4 +12,3 @@ dev/
 yolov2_dev/
 
 test copy.py
-test.py

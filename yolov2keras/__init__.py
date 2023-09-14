@@ -15,36 +15,29 @@ from . import models
 from . import losses
 from . import metrics
 from . import config
+from . import inference
 
 import numpy as np
 import tensorflow as tf
 import tensorflow.keras.backend as K
-import math
-
+import math,os,shutil
 
 __name__ = 'yolov2keras'
 
-INPUT_SIZE = 608
-N_ANCHORS = 4
-SCALE_FACTOR = 32
 
+def set_config(classnames_path,input_size=None,num_anchors=None):
+    if input_size:
+        if input_size % config.cell_size != 0:
+            raise ValueError("INPUT_SIZE_ERROR: choose a input_size which is divisible by {:d}.".format(config.cell_size))
 
-
-
-def set_config(input_size,num_anchors,classnames_path):
-    if input_size % config.scaling_factor != 0:
-        raise ValueError("INPUT_SIZE_ERROR: choose a input_size which is divisible by {:d}.".format(config.scaling_factor))
-
-    config.output_size = input_size / config.scaling_factor
-
-    config.input_size = input_size
-    config.cell_size = config.input_size / config.output_size
-    config.num_anchors = num_anchors
+        config.input_size = input_size
+        config.output_size = input_size / config.cell_size
+    
+    if num_anchors: config.num_anchors = num_anchors
 
     config.classnames = open(classnames_path,'r').read().split("\n")
     config.class_to_idx = {classname:idx for idx,classname in enumerate(config.classnames)}
     config.idx_to_class = {idx:classname for idx,classname in enumerate(config.classnames)}
-    
     config.class_colors = {class_name:np.random.rand(3) for class_name in config.classnames}
     
 def set_anchors(anchors):
@@ -129,3 +122,25 @@ def yoloDataset(ds,batch_size=1,prefetch=True,cache=False,drop_remainder=False):
     if prefetch:ds=ds.prefetch(tf.data.AUTOTUNE)
     if cache:ds=ds.cache()
     return ds
+
+def save(export_dir,model):
+    
+    if os.path.exists(export_dir):
+        shutil.rmtree(export_dir)
+    os.makedirs(export_dir)
+
+    np.savetxt(export_dir+"anchors.txt",config.anchors)
+    with open(export_dir+"classnames.txt","w") as f:
+        f.write("\n".join(config.classnames))
+    model.save(export_dir+"model.h5")
+    return export_dir
+
+
+
+def load_model(model_dir):
+
+    set_config(classnames_path=model_dir+"classnames.txt")
+    set_anchors(np.loadtxt(model_dir+"anchors.txt"))
+    object_detector = inference.Detector(model_dir+"model.h5")
+
+    return object_detector

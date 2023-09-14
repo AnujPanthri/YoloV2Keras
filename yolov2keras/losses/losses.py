@@ -62,6 +62,16 @@ def class_loss(y_true,y_pred):
   class_loss=tf.reduce_mean(K.categorical_crossentropy(y_true_class[obj],y_pred_class[obj],from_logits=True))
   return class_loss
 
+
+def yolo_loss(y_true,y_pred):
+  global obj_loss,noobj_loss,box_loss,class_loss
+  obj_loss_val=obj_loss(y_true,y_pred)
+  noobj_loss_val=noobj_loss(y_true,y_pred)
+  box_loss_val=box_loss(y_true,y_pred)
+  class_loss_val=class_loss(y_true,y_pred)
+
+  return (1*obj_loss_val)+(10*noobj_loss_val)+(10*box_loss_val)+(1*class_loss_val)
+
 default_loss_weights={
                         "obj_loss":1,
                         "noobj_loss":10,
