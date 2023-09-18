@@ -1,2 +1,2 @@
-from .inference import Detector
+from .inference import *
 from . import helper

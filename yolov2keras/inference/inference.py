@@ -62,6 +62,8 @@ class SquarePad:
                                 self.h_added) / (1 - 2 * self.h_added)
             objs_found[i][4] = (objs_found[i][4]) / (1 - 2 * self.w_added)
             objs_found[i][5] = (objs_found[i][5]) / (1 - 2 * self.h_added)
+        
+        objs_found[:,2:]=np.clip(objs_found[:,2:],0,1)  # to set object's boundaries to within image
         return objs_found
 
 
