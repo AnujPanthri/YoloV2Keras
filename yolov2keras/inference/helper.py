@@ -62,7 +62,9 @@ def show_objects(img, objs_found):
 
 
 def pred_image(img, objs_found, font_scale=2, thickness=4):
-
+    if (type(img) == str):
+        img = cv2.cvtColor(cv2.imread(img), cv2.COLOR_BGR2RGB)
+    
     
     for i in range(len(objs_found)):
         # p,c_idx,x,y,w,h

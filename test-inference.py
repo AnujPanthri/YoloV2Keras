@@ -15,3 +15,4 @@ detections = object_detector.predict(img)
 print(detections)
 
 yod.inference.helper.show_objects(img,detections)
+# print(yod.inference.helper.pred_image(img,detections).shape)

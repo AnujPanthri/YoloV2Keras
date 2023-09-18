@@ -56,14 +56,13 @@ class SquarePad:
     def rescale(self, objs_found):
 
         for i in range(len(objs_found)):
-            objs_found[i][2] = (objs_found[i][2] -
-                                self.w_added) / (1 - 2 * self.w_added)
-            objs_found[i][3] = (objs_found[i][3] -
-                                self.h_added) / (1 - 2 * self.h_added)
-            objs_found[i][4] = (objs_found[i][4]) / (1 - 2 * self.w_added)
-            objs_found[i][5] = (objs_found[i][5]) / (1 - 2 * self.h_added)
+            objs_found[i][2] = np.clip((objs_found[i][2] -
+                                self.w_added) / (1 - 2 * self.w_added),0,1)
+            objs_found[i][3] = np.clip((objs_found[i][3] -
+                                self.h_added) / (1 - 2 * self.h_added),0,1)
+            objs_found[i][4] = np.clip((objs_found[i][4]) / (1 - 2 * self.w_added),0,1)
+            objs_found[i][5] = np.clip((objs_found[i][5]) / (1 - 2 * self.h_added),0,1)
         
-        objs_found[:,2:]=np.clip(objs_found[:,2:],0,1)  # to set object's boundaries to within image
         return objs_found
 
 
