@@ -132,6 +132,7 @@ def save(export_dir,model):
     np.savetxt(export_dir+"anchors.txt",config.anchors)
     with open(export_dir+"classnames.txt","w") as f:
         f.write("\n".join(config.classnames))
+    model.compile()
     model.save(export_dir+"model.h5")
     return export_dir
 
