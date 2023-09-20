@@ -4,7 +4,7 @@ from glob import glob
 import yolov2keras as yod
 
 
-model_path="output/v2/"
+model_path="output/v1/"
 object_detector = yod.load_model(model_path)
 object_detector.set_config(p_thres=0.5,nms_thres=0.3,image_size=[416])
 
