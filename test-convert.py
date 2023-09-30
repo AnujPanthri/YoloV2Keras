@@ -4,7 +4,7 @@ import tensorflow.keras.backend as K
 import numpy as np
 
 
-model_dir="output/v1/"
+model_dir="output/pascal_voc/"
 
 yod.set_config(classnames_path=model_dir+"classnames.txt")
 yod.set_anchors(np.loadtxt(model_dir+"anchors.txt"))

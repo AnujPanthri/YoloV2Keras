@@ -71,5 +71,5 @@ model.compile(optimizer=optimizer,loss=yod.losses.yolo_loss,metrics=metrics)
 model.fit(train_ds,validation_data=val_ds,epochs=5,verbose=1)
 
 
-model_path="output/v1/"
+model_path="output/mobilenet/"
 yod.save(model_path,model)

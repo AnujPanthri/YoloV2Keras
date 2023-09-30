@@ -1,4 +1,6 @@
 __pycache__
+.pytest_cache
+flagged
 .vscode/
 
 roboflow.voc.zip
@@ -8,7 +10,5 @@ output/
 
 # Virtual environments
 venv/
-dev/
-yolov2_dev/
+myvenv/
 
-test copy.py
