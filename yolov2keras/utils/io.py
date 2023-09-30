@@ -26,48 +26,48 @@ _CACHE_DIR = user_cache_dir(y2k.__name__)
 def GetFileFromUrl(
   url: str, /, *, force=False, out=_CACHE_DIR
 ) -> pathlib.Path:
-  """Download a file from a given URL and save it to a cache directory.
+    """Download a file from a given URL and save it to a cache directory.
 
-  This function downloads a file from the specified URL and saves it to a cache
-  directory. If the file already exists in the cache directory and the `force`
-  argument is set to False, it is returned without downloading it again. If
-  `force` is set to True, the existing file will be replaced.
+    This function downloads a file from the specified URL and saves it to a cache
+    directory. If the file already exists in the cache directory and the `force`
+    argument is set to False, it is returned without downloading it again. If
+    `force` is set to True, the existing file will be replaced.
 
-  Args:
-    url (str): The URL of the file to download.
-    force (bool, optional): If True, force the download even if the file exists.
-    												Default is False.
-    out (str, optional): The output directory to save the downloaded file.
-    											Default is `_CACHE_DIR`.
+    Args:
+      url (str): The URL of the file to download.
+      force (bool, optional): If True, force the download even if the file exists.
+                              Default is False.
+      out (str, optional): The output directory to save the downloaded file.
+                            Default is `_CACHE_DIR`.
 
-  Returns:
-    pathlib.Path: A Path object representing the downloaded file's location in
-                  the cache directory.
+    Returns:
+      pathlib.Path: A Path object representing the downloaded file's location in
+                    the cache directory.
 
-  Example:
-    >>> url = "https://example.com/sample.txt"
-    >>> downloaded_file = GetFileFromUrl(url)
-    >>> print(downloaded_file)
-    PosixPath('download_cache/sample.txt')
+    Example:
+      >>> url = "https://example.com/sample.txt"
+      >>> downloaded_file = GetFileFromUrl(url)
+      >>> print(downloaded_file)
+      PosixPath('download_cache/sample.txt')
 
-  Notes:
-    - The cache directory (_CACHE_DIR) is used to store downloaded files.
-    - The function checks if the file already exists in the cache before
-      downloading it, based on the `force` argument.
-    - The `wget` library is used to perform the file download.
-    - You can change the cache directory by modifying the `_CACHE_DIR` variable.
-  """
-  if not os.path.exists(out):
-    os.makedirs(out)
+    Notes:
+      - The cache directory (_CACHE_DIR) is used to store downloaded files.
+      - The function checks if the file already exists in the cache before
+        downloading it, based on the `force` argument.
+      - The `wget` library is used to perform the file download.
+      - You can change the cache directory by modifying the `_CACHE_DIR` variable.
+    """
+    if not os.path.exists(out):
+        os.makedirs(out)
 
-  basename = os.path.basename(urlparse(url).path)
+    basename = os.path.basename(urlparse(url).path)
 
-  f_exists = os.access(os.path.join(out, basename), os.F_OK | os.R_OK)
-  if f_exists and force is False:
+    f_exists = os.access(os.path.join(out, basename), os.F_OK | os.R_OK)
+    if f_exists and force is False:
+        return pathlib.Path(os.path.join(out, basename))
+    elif f_exists and force is True:
+        os.remove(os.path.join(out, basename))
+
+    wget.download(url, out=out)
+
     return pathlib.Path(os.path.join(out, basename))
-  else f_exists and force is True:
-  	os.remove(os.path.join(out, basename))
-
-  wget.download(url, out=out)
-
-  return pathlib.Path(os.path.join(out, basename))
