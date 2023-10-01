@@ -3,6 +3,9 @@ import setuptools
 with open("README.md","r",encoding="utf-8") as f:
     long_description = f.read()
 
+with open("requirements.txt","r") as f:
+    reqs = f.readlines()
+
 setuptools.setup(
     name = "YoloV2Keras",
     version ='0.0.1',
@@ -13,5 +16,6 @@ setuptools.setup(
     long_description_content_type = "text/markdown",
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
-    python_requires=">=3.6"
+    python_requires=">=3.6",
+    install_requires=reqs
 )
