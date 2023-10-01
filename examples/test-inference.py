@@ -3,8 +3,8 @@ import tensorflow as tf
 
 
 # Inference
-# model_path="output/v1/"
-model_path="output/pascal_voc/"
+model_path="output/v1/"
+# model_path="output/pascal_voc/"
 # model_path="output/mobilenet/"
 
 

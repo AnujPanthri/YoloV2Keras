@@ -12,3 +12,7 @@ output/
 venv/
 myvenv/
 
+build/
+dist/
+
+src/YoloV2Keras.egg-info

@@ -4,7 +4,7 @@ from glob import glob
 import yolov2keras as yod
 
 
-model_path="output/v1/"
+# model_path="output/v1/"
 model_path="output/pascal_voc/"
 
 object_detector = yod.load_model(model_path)
@@ -23,8 +23,8 @@ def get_output(img,p_thres,nms_thres,image_size):
 
 
 app=gr.Interface(get_output,inputs=[
-                                    gr.Image(),
-                                    # gr.Image(streaming=True,source='webcam'),
+                                    # gr.Image(),
+                                    gr.Image(streaming=True,source='webcam'),
                                     gr.Slider(0,1,value=0.6,label='min_confidence'),
                                     gr.Slider(0,1,value=0.3,label='nms_iou_threshold'),
                                     gr.Slider(256,2080,step=32,value=256,label='image_size'),],
