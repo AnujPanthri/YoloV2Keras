@@ -8,7 +8,7 @@ with open("requirements.txt","r") as f:
 
 setuptools.setup(
     name = "YoloV2Keras",
-    version ='0.0.1',
+    version ='0.0.2',
     author = "Anuj Panthri",
     author_email="panthrianuj@gmail.com",
     description="Yolo v2 library",
