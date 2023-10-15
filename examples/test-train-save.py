@@ -18,7 +18,8 @@ with open(classnames_path,'w') as f:
 
 yod.set_config(input_size=416,num_anchors=5,classnames_path=classnames_path)
 
-# print(yod.config.classnames)
+# print(len(yod.config.classnames))
+# exit()
 # print(yod.config.class_to_idx)
 # print(yod.config.idx_to_class)
 

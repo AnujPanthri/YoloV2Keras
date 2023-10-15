@@ -91,7 +91,7 @@ class VOCDataset(BaseDataset):
         classnames.extend(self.get_class_names(annotation_dir))
       
       with open(classnames_path,"w") as f:
-        f.write("\n".join(classnames))
+        f.write("\n".join(set(classnames)))
     return classnames_path
 
   def get_class_names(

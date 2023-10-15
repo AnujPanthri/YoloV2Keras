@@ -6,7 +6,7 @@ with open("README.md","r",encoding="utf-8") as f:
 
 setuptools.setup(
     name = "YoloV2Keras",
-    version ='0.0.4',
+    version ='0.0.5',
     author = "Anuj Panthri",
     author_email="panthrianuj@gmail.com",
     description="Yolo v2 library",
