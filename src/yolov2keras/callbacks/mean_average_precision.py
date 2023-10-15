@@ -123,6 +123,8 @@ def calculate_MAP(y_true, y_pred,iou_thres=0.5):
     for class_idx in range(len(config.classnames)):
                 
         recalls,precisions=yod.callbacks.calculate_MAP_for_class(y_true,y_pred,class_idx=class_idx,iou_thres=iou_thres)
+        if recalls is None and precisions is None:
+            continue
         APs.append(np.trapz(precisions,recalls))
 
     return APs
