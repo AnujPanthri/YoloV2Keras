@@ -68,9 +68,9 @@ class SquarePad:
 
 class Detector:
 
-    def __init__(self, model_path):
+    def __init__(self, model):
 
-        self.model = load_model(model_path)
+        self.model = load_model(model) if isinstance(model,str) else model
         self.modes_available = ["sized"]
         self.square_preprocessing = SquarePad()
 
@@ -155,7 +155,7 @@ class Detector:
 
         all_objs_found = np.array(all_objs_found)
       
-        all_objs_found = nms(all_objs_found, self.nms_thres)     
+        all_objs_found = nms(all_objs_found, self.nms_thres)   
         all_objs_found = self.square_preprocessing.rescale(
             all_objs_found)  #rescale coordinates to original image's resolution
         for obj_found in all_objs_found:

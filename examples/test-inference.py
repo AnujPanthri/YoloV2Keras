@@ -8,7 +8,8 @@ model_path="output/v1/"
 # model_path="output/mobilenet/"
 
 
-object_detector = yod.load_model(model_path)
+# object_detector = yod.load_model(model_path)
+object_detector = yod.load_model_from_weights(model_path)
 object_detector.set_config(p_thres=0.5,nms_thres=0.3,image_size=[416])
 img="C:/Users/panth/OneDrive/Pictures/Camera Roll/WIN_20230815_13_49_11_Pro.jpg"
 

@@ -3,7 +3,7 @@ import tensorflow.keras.backend as K
 from yolov2keras import config
 
 
-def get_objects(y_pred, p=0.5, decode_preds=True):
+def get_objects(y_pred, p=0.5, decode_preds=True,example_idx=None):
     '''
       Used to process yolov2 output to objects found list
     '''
@@ -37,13 +37,14 @@ def get_objects(y_pred, p=0.5, decode_preds=True):
             obj[0] = np.clip(obj[0] - (obj[2] / 2), 0, output_size)  # xmin
             obj[1] = np.clip(obj[1] - (obj[3] / 2), 0, output_size)  # ymin
 
-            obj_details = [
-                prob, obj[4], *list(obj[:-1] / output_size)
+            obj_details = [prob,
+                obj[4], *list(obj[:-1] / output_size)
             ]  # xywh are scaled 0 to 1 [P,C_IDX,CENTER_X,CENTER_Y,W,H]
 
+            if example_idx!=None: obj_details.insert(0,example_idx)
             objs_found.append(obj_details)
 
-    return np.array(objs_found)
+    return objs_found
 
 
 def list_get_iou(bboxes1, bboxes2):
@@ -72,8 +73,9 @@ def list_get_iou(bboxes1, bboxes2):
 
 
 def np_iou(bboxes1, bboxes2):
-    # bboxes has xywh => xmin,ymin,width,height
-
+    ''' 
+    bboxes has xywh => xmin,ymin,width,height
+    '''
     boxes1_x1 = bboxes1[:, 0]
     boxes1_y1 = bboxes1[:, 1]
     boxes1_x2 = boxes1_x1 + bboxes1[:, 2]

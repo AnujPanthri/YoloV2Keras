@@ -57,19 +57,18 @@ for data in val_ds.take(1):
 
 # yod.dataset.helper.show_yolo_examples(train_ds)
 
-# model = yod.models.getYolov2(pretrained=True)
-model = yod.models.getMobileNet(pretrained=True)
+# model = yod.models.get_model(basemodel="yolov2",pretrained=True)
+model = yod.models.get_model(basemodel="mobilenet",pretrained=True)
 # model.summary()
 
-# losses = [yod.losses.obj_loss,yod.losses.noobj_loss,yod.losses.box_loss,yod.losses.class_loss]
-# loss_weights = [yod.losses.default_loss_weights[loss.__name__] for loss in losses]
 optimizer = tf.keras.optimizers.Adam(learning_rate=1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
 metrics = [yod.metrics.iou_acc , yod.metrics.class_acc ] + [yod.losses.obj_loss,yod.losses.noobj_loss,yod.losses.box_loss,yod.losses.class_loss]
-# model.compile(optimizer=optimizer,loss=losses,metrics=metrics,loss_weights=loss_weights)
+
 model.compile(optimizer=optimizer,loss=yod.losses.yolo_loss,metrics=metrics)
 
-model.fit(train_ds,validation_data=val_ds,epochs=5,verbose=1)
+mapcallback=yod.callbacks.MAPCallback(val_ds,iou_thres=0.5,per_nth_epoch=1)
 
+model.fit(train_ds,validation_data=val_ds,epochs=5,verbose=1,callbacks=[mapcallback])
 
 model_path="output/mobilenet/"
 yod.save(model_path,model)

@@ -16,6 +16,7 @@ from . import losses
 from . import metrics
 from . import config
 from . import inference
+from . import callbacks
 
 import numpy as np
 import tensorflow as tf
@@ -35,7 +36,7 @@ def set_config(classnames_path,input_size=None,num_anchors=None):
     
     if num_anchors: config.num_anchors = num_anchors
 
-    config.classnames = open(classnames_path,'r').read().split("\n")
+    config.classnames = sorted(open(classnames_path,'r').read().split("\n"))
     config.class_to_idx = {classname:idx for idx,classname in enumerate(config.classnames)}
     config.idx_to_class = {idx:classname for idx,classname in enumerate(config.classnames)}
     config.class_colors = {class_name:np.random.rand(3) for class_name in config.classnames}
@@ -132,14 +133,30 @@ def save(export_dir,model):
     np.savetxt(export_dir+"anchors.txt",config.anchors)
     with open(export_dir+"classnames.txt","w") as f:
         f.write("\n".join(config.classnames))
+    with open(export_dir+"modelname.txt","w") as f:
+        f.write(model.basename)
     model.compile()
     model.save(export_dir+"model.h5")
     return export_dir
 
 
 
+def load_model_from_weights(model_dir):
+
+    
+    set_config(classnames_path=model_dir+"classnames.txt")
+    set_anchors(np.loadtxt(model_dir+"anchors.txt"))
+    with open(model_dir+"modelname.txt") as f:
+        model = models.get_model(basemodel=f.read(),pretrained=None)
+
+    model.load_weights(model_dir+"model.h5")
+    object_detector = inference.Detector(model)
+
+    return object_detector
+
 def load_model(model_dir):
 
+    
     set_config(classnames_path=model_dir+"classnames.txt")
     set_anchors(np.loadtxt(model_dir+"anchors.txt"))
     object_detector = inference.Detector(model_dir+"model.h5")
