@@ -90,27 +90,29 @@ class VOCDataset(BaseDataset):
       for annotation_dir in annotation_dirs:
         classnames.extend(self.get_class_names(annotation_dir))
       
-      with open(classnames_path,"w") as f:
-        f.write("\n".join(set(classnames)))
-    return classnames_path
+      classnames=list(set(classnames))
+      classnames.sort()
 
+      with open(classnames_path,"w") as f:
+        f.write("\n".join(classnames))
+    return classnames_path
+  
+  @staticmethod
   def get_class_names(
           xmls_dir: str
           ) -> list:
 
     xml_fpaths = glob(xmls_dir+"*.xml")
 
-    annot_objs = []
     annot_cls_names = []
     for fpath in xml_fpaths:
         tree = ET.parse(fpath)
         root = tree.getroot()
 
         for o in root.findall('object'):
-            annot_cls_names = [
-                *annot_cls_names,
+            annot_cls_names.append(
                 o.find('name').text.lower()
-            ]          
+            )          
 
     annot_cls_names = list(set(annot_cls_names))
     annot_cls_names.sort()

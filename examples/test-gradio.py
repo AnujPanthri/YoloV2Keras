@@ -5,9 +5,13 @@ import yolov2keras as yod
 
 
 # model_path="output/v1/"
-model_path="output/pascal_voc/"
+# model_path="output/v2/"
+model_path="output/v3/"
+# model_path="output/pascal_voc/"
+# model_path="output/pascal_voc_new/"
 
-object_detector = yod.load_model(model_path)
+# object_detector = yod.load_model(model_path)
+object_detector = yod.load_model_from_weights(model_path)
 object_detector.set_config(p_thres=0.5,nms_thres=0.3,image_size=[416])
 
 def get_output(img,p_thres,nms_thres,image_size):
@@ -23,8 +27,8 @@ def get_output(img,p_thres,nms_thres,image_size):
 
 
 app=gr.Interface(get_output,inputs=[
-                                    # gr.Image(),
-                                    gr.Image(streaming=True,source='webcam'),
+                                    gr.Image(),
+                                    # gr.Image(streaming=True,source='webcam'),
                                     gr.Slider(0,1,value=0.6,label='min_confidence'),
                                     gr.Slider(0,1,value=0.3,label='nms_iou_threshold'),
                                     gr.Slider(256,2080,step=32,value=256,label='image_size'),],
@@ -33,6 +37,6 @@ app=gr.Interface(get_output,inputs=[
                                     title="Yolo V2 Face detection(sized-mode)",
                                     description=f"we can detection objects which are: {', '.join(yod.config.classnames)}",
                                     # examples=[[item] for item in glob('imgs/*')],
-                                    # live=True
+                                    live=True
                                     )
 app.launch(debug=True)
